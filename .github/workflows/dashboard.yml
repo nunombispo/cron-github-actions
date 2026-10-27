@@ -2,7 +2,8 @@ name: render-dashboard
 
 on:
   schedule:
-    - cron: '12 * * * *'   # after the collector has run
+    # Every hour at minute 12 UTC, after the collector has usually finished.
+    - cron: '12 * * * *'
   workflow_dispatch:
 
 concurrency:

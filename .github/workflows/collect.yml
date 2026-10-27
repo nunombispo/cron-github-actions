@@ -2,6 +2,7 @@ name: collect-weather
 
 on:
   schedule:
+    # Every hour at minute 7 UTC (off the top of the hour to reduce delay).
     - cron: '7 * * * *'
   workflow_dispatch:
 
