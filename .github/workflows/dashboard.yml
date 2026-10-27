@@ -1,0 +1,41 @@
+name: render-dashboard
+
+on:
+  schedule:
+    - cron: '12 * * * *'   # after the collector has run
+  workflow_dispatch:
+
+concurrency:
+  group: render-dashboard
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - run: python render.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Publish to the eink branch
+        run: |
+          cd out
+          git init -q -b eink
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dashboard.png dashboard.bin
+          git commit -q -m 'Update dashboard'
+          git push -f 'https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git' eink
